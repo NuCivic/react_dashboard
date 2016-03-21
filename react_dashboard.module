@@ -1,0 +1,45 @@
+<?php
+
+/**
+ * Implements hook_ctools_plugin_api().
+ */
+function react_dashboard_ctools_plugin_api($owner, $api) {
+  if ($owner == 'services' && $api == 'services') {
+    return array(
+      'version' => 3,
+    );
+  }
+}
+
+/**
+ * Implements hook_menu().
+ */
+function react_dashboard_menu() {
+  $items['react_dashboard'] = array(
+    'title' => 'React Dashboard Example',
+    'page callback' => '_react_dashboard_page',
+    'access arguments' => array('access content'),
+  );
+
+  return $items;
+}
+
+/**
+ *
+ */
+function _react_dashboard_page() {
+  return theme('react_dashboard');
+}
+
+/*
+ * Implement hook_theme().
+ */
+function react_dashboard_theme(){
+  return array(
+    'react_dashboard' => array(
+      'template' => 'react-dashboard',
+      'path' => drupal_get_path('module', 'react_dashboard') . '/templates',
+    ),
+  );
+}
+
