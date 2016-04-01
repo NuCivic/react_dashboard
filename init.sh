@@ -12,3 +12,7 @@ if [[ $? -ne 0 ]]; then
   echo "ERROR: npm install failed"
   exit 1
 fi
+
+# Delete not needed dirs and files
+rm -rf .git
+rm .gitignore
