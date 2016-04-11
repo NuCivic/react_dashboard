@@ -1,11 +1,11 @@
-EXAMPLE_REPO="git@github.com:NuCivic/react-dashboard-example.git"
+REPO="git@github.com:NuCivic/react-dashboard-boilerplate.git"
 
-# Clone the react dashboard example app.
-echo "- Cloning example application."
-git clone ${EXAMPLE_REPO} ./app
+# Clone the react dashboard boilerplate app.
+echo "- Cloning boilerplate application."
+git clone ${REPO} ./app
 
 # Install app.
-echo "- Installing example application."
+echo "- Installing boilerplate application."
 cd ./app
 npm install
 if [[ $? -ne 0 ]]; then
