@@ -1,14 +1,14 @@
 # React Dashboard Drupal Module
 
-This is a boilerplate to create dashboards in drupal by using the react dashboard library. Library documentation is available at https://github.com/NuCivic/react-dashboard
+This is a boilerplate to create dashboards in Drupal by using the **React Dashboard** library. Library documentation is available at https://github.com/NuCivic/react-dashboard
 
-Feel free to modify this code to fit this into your project requirements. If you think there is something that can be provided out-of-the-box please create a PR.
+Feel free to modify this code to fit your project requirements. If you think there is something that can be provided out-of-the-box please create a PR.
 
 
 ## What's provided?
 
 * A working example
-* A drupal page with the needed markup to render a dashboard
+* A Drupal page with the needed markup to render a dashboard
 * An endpoint to expose the data to be consumed by your dashboard
 * An example of the autocomplete endpoint
 
@@ -26,7 +26,7 @@ $ open http://localhost:5000/
 
 ## Autocomplete endpoint
 
-A placeholder function to retrieve options ready to be consumed by the react autocomplete component.
+A placeholder function to retrieve options ready to be consumed by the *React autocomplete* component.
 
 The required autocomplete format is:
 
@@ -40,22 +40,22 @@ The required autocomplete format is:
 ]
 ```
 
-There is an example in the code using EntityFieldQuery but you can use any drupal available method to retrieve data only to the requirement of retrieve something with the above format.
+We give an example in the code using *EntityFieldQuery* but you can use any Drupal method available to retrieve data as long as it's similar to the format used above.
 
 
 ## Data endpoint
 
-As the autocomplete endpoint this is a placeholder function. It doesn't provide functionality but facilitate to the developer the dashboard creating by registering a new endpoint.
+As the autocomplete endpoint, this is a placeholder function. It doesn't provide true functionality, but it does allow you create a dashboard by registering a new endpoint.
 
-You can use any drupal method to query data: db_select, EntityFieldQuery, etc. 
+You can use any Drupal method to query data: db_select, EntityFieldQuery, etc. 
 
-**Why you don't provide an standarized way to retrieve data?**
-Because data shape is different across projects. Sometimes a csv is enough. Other times you need to expose a robust api to query data. 
+**Why don't you provide a standarized way to retrieve data?**
+Data format differs across projects. Sometimes a csv is enough, and other times you need to expose a robust api to query data. So creating standards didn't make sense in this module. 
 
 
 ## Dashboard template
 
-The dashboard template contains the markup to render the dashboard. It has the root div and load the required css and js files.
+The **Dashboard template** contains the markup to render the dashboard. It has the root div and load the required css and js files.
 
 
 ## Build
