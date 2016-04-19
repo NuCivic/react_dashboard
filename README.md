@@ -1,14 +1,14 @@
 # React Dashboard Drupal Module
 
-This is a boilerplate to create dashboards in drupal by using the react dashboard library. Library documentation is available at https://github.com/NuCivic/react-dashboard
+This is a boilerplate to create dashboards in Drupal by using the **React Dashboard** library. Library documentation is available at https://github.com/NuCivic/react-dashboard
 
-Feel free to modify this code to fit this into your project requirements. If you think there is something that can be provided out-of-the-box please create a PR.
+Feel free to modify this code to fit your project requirements. If you think there is something that can be provided out-of-the-box please create a PR.
 
 
 ## What's provided?
 
 * A working example
-* A drupal page with the needed markup to render a dashboard
+* A Drupal page with the needed markup to render a dashboard
 * An endpoint to expose the data to be consumed by your dashboard
 * An example of the autocomplete endpoint
 
@@ -26,7 +26,7 @@ $ open http://localhost:5000/
 
 ## Autocomplete endpoint
 
-Given a node and, a field and a value it retrieves all the posible values.
+A placeholder function to retrieve options ready to be consumed by the *React autocomplete* component.
 
 `/dashboard_autocomplete/%node/%field/%value`
 
@@ -58,7 +58,7 @@ Provides an endpoint to query resources using filters and aggregations for a giv
 
 ## Dashboard template
 
-The dashboard template contains the markup to render the dashboard. It has the root div and load the required css and js files.
+The **Dashboard template** contains the markup to render the dashboard. It has the root div and load the required css and js files.
 
 ## Build
 
