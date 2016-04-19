@@ -26,9 +26,11 @@ $ open http://localhost:5000/
 
 ## Autocomplete endpoint
 
-A placeholder function to retrieve options ready to be consumed by the react autocomplete component.
+Given a node and, a field and a value it retrieves all the posible values.
 
-The required autocomplete format is:
+`/dashboard_autocomplete/%node/%field/%value`
+
+And it returns the data ready to be consumed by the autocomplete component.
 
 ```javascript
 [
@@ -40,23 +42,23 @@ The required autocomplete format is:
 ]
 ```
 
-There is an example in the code using EntityFieldQuery but you can use any drupal available method to retrieve data only to the requirement of retrieve something with the above format.
-
 
 ## Data endpoint
 
-As the autocomplete endpoint this is a placeholder function. It doesn't provide functionality but facilitate to the developer the dashboard creating by registering a new endpoint.
+Provides an endpoint to query resources using filters and aggregations for a given node.
 
-You can use any drupal method to query data: db_select, EntityFieldQuery, etc. 
+**Example:**
+`/dashboard_data/12?year=2014&sum=agency`
 
-**Why you don't provide an standarized way to retrieve data?**
-Because data shape is different across projects. Sometimes a csv is enough. Other times you need to expose a robust api to query data. 
-
+**Options:**
+*column*=*value*: Any column in the database can be used as a filter.
+*agregation_function=column*: Any available agregation function available in mysql can be used. Computed fields are automatically aliased as aggregation_column (e.g. sum_arrests)
+*groupBy*: a comma separated list of fields to group by.
+*limit*: the range of results to retrieve (e.g. 0, 100);
 
 ## Dashboard template
 
 The dashboard template contains the markup to render the dashboard. It has the root div and load the required css and js files.
-
 
 ## Build
 
