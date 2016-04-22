@@ -16,8 +16,9 @@ function react_dashboard_theme(){
  * Implements hook_menu().
  */
 function react_dashboard_menu() {
-  $items['dashboard'] = array(
-    'title' => 'Dashboard',
+  $items['dashboard/%node'] = array(
+    'title' => '',
+    'page arguments' => array(1),
     'page callback' => '_react_dashboard_page',
     'access arguments' => array('access content'),
   );
@@ -27,13 +28,15 @@ function react_dashboard_menu() {
     'page arguments' => array(1),
     'page callback' => '_react_dashboard_data',
     'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK
   );
 
-  $items['dashboard_autocomplete/%node/%field/%value'] = array(
+  $items['dashboard_autocomplete/%node'] = array(
     'title' => 'Dashboard Autocomplete',
-    'page arguments' => array(2),
+    'page arguments' => array(1),
     'page callback' => '_react_dashboard_autocomplete',
     'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK
   );
 
   return $items;
@@ -42,7 +45,10 @@ function react_dashboard_menu() {
 /**
  * Returns the dashboard page
  */
-function _react_dashboard_page() {
+function _react_dashboard_page($node) {
+  drupal_add_js(array('react_dashboard' => array('currentNid' => $node->nid)), 'setting');
+  drupal_add_css( drupal_get_path('module','react_dashboard') . '/app/dist/bundle.min.css' );
+  drupal_add_js( drupal_get_path('module','react_dashboard') . '/app/dist/bundle.min.js' );
   return theme('react_dashboard');
 }
 
@@ -62,7 +68,7 @@ function _react_dashboard_autocomplete($node, $field, $value) {
   if(empty($node) || empty($field)) return drupal_json_output($options);
   $datastore = dkan_datastore_go($node->uuid);
   $table = $datastore->tableName;
-  $limit = array(0, 10);
+  $limit = array(0, 100);
   try {
     $query = db_select($table , 'r')
       ->fields('r')
@@ -71,7 +77,7 @@ function _react_dashboard_autocomplete($node, $field, $value) {
       $query->condition($field, '%'. $value . '%', 'LIKE');
     }
     $result = $query
-      ->range($limit[0],$limit[1])
+      ->range($limit[0], $limit[1])
       ->execute();
 
     while ($row = $result->fetchAssoc()) {
@@ -126,24 +132,48 @@ function _map_autocomplete_fields($mappings){
  * @return array An array with the data for your dashboard
  */
 
-// year=123,month=Dec,adult=true,limit=0,10,county='',agency=''
 function _react_dashboard_data($node) {
+  if($_SERVER['REQUEST_METHOD'] === 'GET') {
+    $params =  drupal_get_query_parameters();
+    $result = _react_dashboard_query($node, $params);
+  } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $result = array();
+    $request_body = json_decode(file_get_contents('php://input'));
+    $queries = $request_body;
+    foreach ((array)$queries as $name => $query) {
+      $result[$name] = _react_dashboard_query($node, (array)$query);
+    }
+  }
+  return drupal_json_output($result);
+}
+
+function _react_dashboard_query($node, $params) {
+
   $omit = array('limit', 'groupBy');
   $aggregations = array('sum', 'avg', 'count', 'max', 'min', 'std', 'variance');
   $datastore = dkan_datastore_go($node->uuid);
   $table = $datastore->tableName;
-  $params =  drupal_get_query_parameters();
   $limit = array(0, 10);
-  $query = db_select($table , 'r')->fields('r');
+  $fields = array();
+  $query = db_select($table);
 
   foreach ($params as $key => $value) {
     switch ($key) {
+      case 'fields':
+        $fields = (array)_param($params['fields']);
+        break;
       case 'limit':
-        $limit = $params['limit'];
-        $limit = explode(',', $limit);
+        $limit = _param($params['limit']);
+        break;
+      case 'orderBy':
+        $orderBy = (array)_param($value);
+        foreach ($orderBy as $st) {
+          $st = (is_string($st) && strpos($st, ':') !== FALSE) ? explode(':', $st) : $st;
+          $query->orderBy($st[0], $st[1]);
+        }
         break;
       case 'groupBy':
-        $groupBy = explode(',', $value);
+        $groupBy = (array)_param($value);
         foreach ($groupBy as $column) {
           $query->groupBy($column);
         }
@@ -152,14 +182,32 @@ function _react_dashboard_data($node) {
         $query->addExpression($key . '(' .$value. ')', $value . '_' . $key);
         break;
       default:
-        $query->condition($key, $value, '=');
+        $values = _param($value);
+        if(is_array($values)) {
+          $db_or = db_or();
+          foreach ($values as $val) {
+            $db_or->condition($key, $val, '=');
+          }
+          $query->condition($db_or);
+        } else {
+          $query->condition($key, $values, '=');
+        }
         break;
     }
   }
-  $result = $query
-    ->range($limit[0],$limit[1])
+
+  $query->fields($table);
+  $query->range($limit[0],$limit[1]);
+
+  return $query
     ->execute()
     ->fetchAll();
 
-  drupal_json_output($result);
+}
+
+function _param($value) {
+  if ($_SERVER['REQUEST_METHOD'] == 'GET' && strpos($value, ',') !== FALSE) {
+    return explode(',', $value);
+  }
+  return $value;
 }
