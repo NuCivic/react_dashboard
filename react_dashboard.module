@@ -91,7 +91,7 @@ function _react_dashboard_autocomplete($node, $field, $value) {
  * @param  array  $mappings An array with the mappings. e.g. array('label'=>'title', 'value' => 'uid')
  * @return array            The converted array
  */
-function _to_autocomplete($items, $mappings) {
+function _react_dashboard_to_autocomplete($items, $mappings) {
   return array_map(
     _map_autocomplete_fields($mappings),
     array_values($items));
@@ -102,7 +102,7 @@ function _to_autocomplete($items, $mappings) {
  * @param  array $mappings  An array with the mappings. e.g. array('label'=>'title', 'value' => 'uid')
  * @return function
  */
-function _map_autocomplete_fields($mappings){
+function _react_dashboard__map_autocomplete_fields($mappings){
   return function($item) use ($mappings) {
     return array(
       'label' => $item->{$mappings['label']},
