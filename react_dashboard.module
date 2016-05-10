@@ -16,20 +16,20 @@ function react_dashboard_theme(){
  * Implements hook_menu().
  */
 function react_dashboard_menu() {
-  $items['dashboard'] = array(
+  $items['react_dashboard'] = array(
     'title' => 'Dashboard',
     'page callback' => '_react_dashboard_page',
     'access arguments' => array('access content'),
   );
 
-  $items['dashboard_data/%node'] = array(
+  $items['react_dashboard_data/%node'] = array(
     'title' => 'Dashboard Data',
     'page arguments' => array(1),
     'page callback' => '_react_dashboard_data',
     'access arguments' => array('access content'),
   );
 
-  $items['dashboard_autocomplete/%node/%field/%value'] = array(
+  $items['react_dashboard_autocomplete/%node/%field/%value'] = array(
     'title' => 'Dashboard Autocomplete',
     'page arguments' => array(2),
     'page callback' => '_react_dashboard_autocomplete',
