@@ -254,7 +254,7 @@ export var settings = {
         fetchData: {
           type:'backend',
           backend: 'dkan',
-          endpoint: 'http://dkan/node/12/api',
+          endpoint: '/node/12/api',
           id: 'da713535-5fca-41d1-a7f8-d0698014ee69'
         },
         cardStyle: 'table',

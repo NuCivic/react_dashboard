@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {Dashboard, Dataset} from 'react-dashboard';
 import NVD3Chart from 'react-nvd3';
-import {mapValues, map} from 'lodash';
+import {mapValues, map, isEmpty, omit} from 'lodash';
 
 export default class GADashboard extends Dashboard {
 
@@ -29,7 +29,9 @@ export default class GADashboard extends Dashboard {
 
 
   filter(queries, values, field) {
+    let empty = isEmpty(values);
     return mapValues(queries, function(query) {
+      if(empty) return omit(query, field);
       query[field] = values;
       return query;
     });
@@ -41,7 +43,7 @@ export default class GADashboard extends Dashboard {
         let values = map(payload.value, 'value');
         let field = payload.id.split('-')[0];
         let q = this.filter(this.state.queries, values, field);
-
+        console.log(q);
         this.setState({queries: q});
         this.fetchData(q);
         break;
