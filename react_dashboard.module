@@ -31,15 +31,23 @@ function react_dashboard_menu() {
     'type' => MENU_CALLBACK
   );
 
-  $items['dashboard_autocomplete/%node'] = array(
+  $items['dashboard_autocomplete'] = array(
     'title' => 'Dashboard Autocomplete',
-    'page arguments' => array(1),
     'page callback' => '_react_dashboard_autocomplete',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK
+  );
+  $items['foo'] = array(
+    'title' => 'foo',
+    'page callback' => '_foo',
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK
   );
 
   return $items;
+}
+function _foo($bar) {
+    var_dump('FOO: ' . $bar);die;
 }
 
 /**
@@ -63,16 +71,16 @@ function _react_dashboard_page($node) {
  *
  * e.g. [ {label: 'One', value: 'one'}, {label: 'Two', value: 'two'}]
  */
-function _react_dashboard_autocomplete($node, $field, $value) {
-  $options = array();
-  if(empty($node) || empty($field)) return drupal_json_output($options);
+function _react_dashboard_autocomplete($node_title) {
+  $nodes = node_load_multiple(NULL, array("title" => $node_title));
+  $node = current($nodes);
+  //if(empty($node) || empty($field)) return drupal_json_output($options);
   $datastore = dkan_datastore_go($node->uuid);
   $table = $datastore->tableName;
   $limit = array(0, 100);
   try {
     $query = db_select($table , 'r')
-      ->fields('r')
-      ->groupBy($field);
+      ->fields('r');
     if(!empty($value)) {
       $query->condition($field, '%'. $value . '%', 'LIKE');
     }
@@ -81,12 +89,12 @@ function _react_dashboard_autocomplete($node, $field, $value) {
       ->execute();
 
     while ($row = $result->fetchAssoc()) {
-      $options[] = array('label' => $row[$field], 'value' => $row[$field]);
+      $options[] = array('label' => $row['county_name'], 'value' => $row['county_number']);
     }
   } catch(Exception $e) {
     return drupal_json_output(array('error' => $e->getMessage()));
-  }
-
+  } 
+  
   return drupal_json_output($options);
 }
 

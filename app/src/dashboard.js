@@ -17,7 +17,7 @@ export default class GADashboard extends Dashboard {
   }
 
   fetchData(queries) {
-    fetch('/dashboard_data/12', {
+    fetch('/dashboard_data/54', {
       method: 'post',
       body: JSON.stringify(queries)
     }).then(response => {

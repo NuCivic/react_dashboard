@@ -41,7 +41,7 @@
     "lodash": "^4.10.0",
     "nvd3": "^1.8.2",
     "react": "^0.14.8",
-    "react-dashboard": "git+ssh://git@github.com/NuCivic/react-dashboard.git",
+    "react-dash": "^0.3.0",
     "react-dom": "^0.14.8",
     "react-nvd3": "^0.5.4",
     "react-select": "^1.0.0-beta12"
