@@ -16,45 +16,38 @@ function react_dashboard_theme(){
  * Implements hook_menu().
  */
 function react_dashboard_menu() {
-  $items['dashboard/%node'] = array(
+  // Loads entire dashboard
+  $items['dashboard'] = array(
     'title' => '',
-    'page arguments' => array(1),
     'page callback' => '_react_dashboard_page',
     'access arguments' => array('access content'),
   );
 
-  $items['dashboard_data/%node'] = array(
+  // Get node data for dashboard resource
+  $items['dashboard_data'] = array(
     'title' => 'Dashboard Data',
-    'page arguments' => array(1),
     'page callback' => '_react_dashboard_data',
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK
   );
-
+  
+  // Get data for autocomplete fields
   $items['dashboard_autocomplete'] = array(
     'title' => 'Dashboard Autocomplete',
     'page callback' => '_react_dashboard_autocomplete',
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK
   );
-  $items['foo'] = array(
-    'title' => 'foo',
-    'page callback' => '_foo',
-    'access arguments' => array('access content'),
-    'type' => MENU_CALLBACK
-  );
 
   return $items;
-}
-function _foo($bar) {
-    var_dump('FOO: ' . $bar);die;
 }
 
 /**
  * Returns the dashboard page
+ * @param $node_title {string} title of resource containing physicians data (GBPW_Physicians)
  */
-function _react_dashboard_page($node) {
-  drupal_add_js(array('react_dashboard' => array('currentNid' => $node->nid)), 'setting');
+function _react_dashboard_page($node_title) {
+  drupal_add_js(array('react_dashboard' => array('drupalDataSource' => $node_title)), 'setting');
   drupal_add_css( drupal_get_path('module','react_dashboard') . '/app/dist/bundle.min.css' );
   drupal_add_js( drupal_get_path('module','react_dashboard') . '/app/dist/bundle.min.js' );
   return theme('react_dashboard');
@@ -62,19 +55,13 @@ function _react_dashboard_page($node) {
 
 
 /**
- * Just a placeholder function showing how to create and enpoind
- * ready to be consumed by the react autocomplete component
- * included inside the react dashboard library.
- * In short you need to retrieve an array with the selection
- * where each selection is an object with the label and value
- * property inside.
- *
- * e.g. [ {label: 'One', value: 'one'}, {label: 'Two', value: 'two'}]
+ * Get csv by name.
+ * csv should have an `id` column and a `name` column
+ * * will return json [{"label": "value"},...]
  */
 function _react_dashboard_autocomplete($node_title) {
   $nodes = node_load_multiple(NULL, array("title" => $node_title));
   $node = current($nodes);
-  //if(empty($node) || empty($field)) return drupal_json_output($options);
   $datastore = dkan_datastore_go($node->uuid);
   $table = $datastore->tableName;
   $limit = array(0, 100);
@@ -89,7 +76,7 @@ function _react_dashboard_autocomplete($node_title) {
       ->execute();
 
     while ($row = $result->fetchAssoc()) {
-      $options[] = array('label' => $row['county_name'], 'value' => $row['county_number']);
+      $options[] = array('label' => $row['name'], 'value' => $row['id']);
     }
   } catch(Exception $e) {
     return drupal_json_output(array('error' => $e->getMessage()));
@@ -98,124 +85,14 @@ function _react_dashboard_autocomplete($node_title) {
   return drupal_json_output($options);
 }
 
-/**
- * Convert an array of nodes to an array with items
- * for the autocomplete
- * @param  array  $items    An array with nodes
- * @param  array  $mappings An array with the mappings. e.g. array('label'=>'title', 'value' => 'uid')
- * @return array            The converted array
- */
-function _to_autocomplete($items, $mappings) {
-  return array_map(
-    _map_autocomplete_fields($mappings),
-    array_values($items));
-}
 
 /**
- * Returns a function to map fields to autocomplete fields.
- * @param  array $mappings  An array with the mappings. e.g. array('label'=>'title', 'value' => 'uid')
- * @return function
+ * Returns node with dashboard resource
+ * react_dash will build queries using node data
+ * We use the datastore api to do the rest
  */
-function _map_autocomplete_fields($mappings){
-  return function($item) use ($mappings) {
-    return array(
-      'label' => $item->{$mappings['label']},
-      'value' => $item->{$mappings['value']}
-    );
-  };
-}
-
-/**
- * This is a placeholder function to retrieve the data for
- * your dashboard.
- * Sometimes you need to retrieve an array with the
- * needed data for the whole dashboard. In that cases you just
- * need to create a query retrieving all the required data.
- *
- * In some cases you need to query server data by passing
- * parameters. In that case you need to modify the menu item
- * to get parameters and add those to this function. Then
- * you can retrieve parametrized data by creating the appropiate
- * query statement.
- * @return array An array with the data for your dashboard
- */
-
-function _react_dashboard_data($node) {
-  if($_SERVER['REQUEST_METHOD'] === 'GET') {
-    $params =  drupal_get_query_parameters();
-    $result = _react_dashboard_query($node, $params);
-  } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $result = array();
-    $request_body = json_decode(file_get_contents('php://input'));
-    $queries = $request_body;
-    foreach ((array)$queries as $name => $query) {
-      $result[$name] = _react_dashboard_query($node, (array)$query);
-    }
-  }
-  return drupal_json_output($result);
-}
-
-function _react_dashboard_query($node, $params) {
-
-  $omit = array('limit', 'groupBy');
-  $aggregations = array('sum', 'avg', 'count', 'max', 'min', 'std', 'variance');
-  $datastore = dkan_datastore_go($node->uuid);
-  $table = $datastore->tableName;
-  $limit = array(0, 10);
-  $fields = array();
-  $query = db_select($table);
-
-  foreach ($params as $key => $value) {
-    switch ($key) {
-      case 'fields':
-        $fields = (array)_param($params['fields']);
-        break;
-      case 'limit':
-        $limit = _param($params['limit']);
-        break;
-      case 'orderBy':
-        $orderBy = (array)_param($value);
-        foreach ($orderBy as $st) {
-          $st = (is_string($st) && strpos($st, ':') !== FALSE) ? explode(':', $st) : $st;
-          $query->orderBy($st[0], $st[1]);
-        }
-        break;
-      case 'groupBy':
-        $groupBy = (array)_param($value);
-        foreach ($groupBy as $column) {
-          $query->groupBy($column);
-        }
-        break;
-      case in_array($key, $aggregations):
-        $query->addExpression($key . '(' .$value. ')', $value . '_' . $key);
-        break;
-      default:
-        $values = _param($value);
-        if(is_array($values)) {
-          $db_or = db_or();
-          foreach ($values as $val) {
-            $db_or->condition($key, $val, '=');
-          }
-          $query->condition($db_or);
-        } else {
-          $query->condition($key, $values, '=');
-        }
-        break;
-    }
-  }
-
-  $query->fields($table);
-  $query->range($limit[0],$limit[1]);
-
-  return $query
-    ->execute()
-    ->fetchAll();
-
-}
-
-function _param($value) {
-  if ($_SERVER['REQUEST_METHOD'] == 'GET' && strpos($value, ',') !== FALSE) {
-    return explode(',', $value);
-  }
-  return $value;
+function _react_dashboard_data($node_title) {
+  $nodes = node_load_multiple(NULL, array("title" => $node_title));
+  $node = current($nodes);
+  return drupal_json_output($node);
 }
