@@ -8,11 +8,13 @@ export default class GADashboard extends Dashboard {
   constructor(props) {
     super(props);
     this.state = {
-      queries: this.props.queries
+      queries: this.props.queries,
+      drupalSettings: this.Drupal.settings.react_dashboard
     };
   }
 
   componentDidMount() {
+    console.log('DASHBOARD >>', this);
     this.fetchData(this.state.queries);
   }
 
