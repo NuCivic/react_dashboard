@@ -15,6 +15,9 @@ if [[ $? -ne 0 ]]; then
   exit 1
 fi
 
+echo "Running react-dashboard boilerplate installer..."
+bash init.sh
+
 # Delete not needed dirs and files
 rm -rf .git
 rm .gitignore
