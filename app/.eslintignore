@@ -1,6 +1,0 @@
-dist/*
-node_modules/*
-**/node_modules/*
-tests/*
-*.config.js
-*.config.production.js
