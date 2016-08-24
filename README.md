@@ -1,4 +1,4 @@
-# React Dashboard Drupal Module
+# React Dashboard Drupal Module 0.3.x
 
 This is a boilerplate to create dashboards in Drupal by using the **React Dashboard** library. Library documentation is available at https://github.com/NuCivic/react-dashboard
 
