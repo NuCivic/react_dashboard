@@ -54,7 +54,7 @@ Provides an endpoint to query resources using filters and aggregations for a giv
 *column*=*value*: Any column in the database can be used as a filter.
 *agregation_function=column*: Any available agregation function available in mysql can be used. Computed fields are automatically aliased as aggregation_column (e.g. sum_arrests)
 *groupBy*: a comma separated list of fields to group by.
-*limit*: the range of results to retrieve (e.g. 0, 100);
+*limit*: the range of results to retrieve (e.g. 0, 100).
 
 ## Dashboard template
 
