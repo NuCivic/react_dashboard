@@ -52,6 +52,12 @@ function _react_dashboard_page($node) {
   return theme('react_dashboard');
 }
 
+/**
+ * Implements hook_page_alter().
+ */
+function react_dashboard_page_alter(&$page) {
+  header_remove('X-Frame-Options');
+}
 
 /**
  * Just a placeholder function showing how to create and enpoind
